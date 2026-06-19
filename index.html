@@ -91,7 +91,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
 
-        /* Elemento real que vai virar o PDF (Zera margens e posicionamento pro HTML2PDF) */
+        /* Elemento real que vai virar o PDF */
         #invoice-pdf {
             width: 100%;
             margin: 0 !important;
@@ -181,7 +181,7 @@
         
         <div class="form-group">
             <label>Tipo de Documento</label>
-            <input type="text" id="docTitle" value="FINAL CONSTRUCTION WORK INVOICE" oninput="renderInvoice()">
+            <input type="text" id="docTitle" value="CONSTRUCTION SERVICE ESTIMATE" placeholder="Ex: FINAL CONSTRUCTION WORK INVOICE" oninput="renderInvoice()">
         </div>
 
         <hr style="border: 0; border-top: 1px solid #e9ecef; margin: 20px 0;">
@@ -189,15 +189,15 @@
         <h3>Dados do Contratante (Cliente)</h3>
         <div class="form-group">
             <label>Nome do Cliente / Empresa</label>
-            <input type="text" id="clientName" value="Rockwell Construction" oninput="renderInvoice()">
+            <input type="text" id="clientName" value="" placeholder="Nome do Cliente" oninput="renderInvoice()">
         </div>
         <div class="form-group">
             <label>Endereço do Cliente</label>
-            <input type="text" id="clientAddress" value="1655 Pinckney Park Dr, Charleston SC 29414" oninput="renderInvoice()">
+            <input type="text" id="clientAddress" value="" placeholder="Endereço Completo" oninput="renderInvoice()">
         </div>
         <div class="form-group">
             <label>Telefone do Cliente (Opcional)</label>
-            <input type="text" id="clientPhone" value="" oninput="renderInvoice()">
+            <input type="text" id="clientPhone" value="" placeholder="Ex: 843-XXX-XXXX" oninput="renderInvoice()">
         </div>
 
         <hr style="border: 0; border-top: 1px solid #e9ecef; margin: 20px 0;">
@@ -205,27 +205,25 @@
         <h3>Serviços e Valores</h3>
         <div class="form-group">
             <label>Descrição dos Serviços Prestados</label>
-            <textarea id="serviceDesc" rows="5" oninput="renderInvoice()">Plaster the existing pillar blocks
-
-Fill some gaps in the foundation on both sides of the house</textarea>
+            <textarea id="serviceDesc" rows="5" placeholder="Descreva aqui o serviço detalhadamente..." oninput="renderInvoice()"></textarea>
         </div>
         <div class="row-grid">
             <div class="form-group">
                 <label>Tamanho / Size (Opcional)</label>
-                <input type="text" id="serviceSize" value="" oninput="renderInvoice()">
+                <input type="text" id="serviceSize" value="" placeholder="Ex: 200 sqft" oninput="renderInvoice()">
             </div>
             <div class="form-group">
                 <label>Mão de Obra / Labor (Opcional)</label>
-                <input type="text" id="serviceLabor" value="" oninput="renderInvoice()">
+                <input type="text" id="serviceLabor" value="" placeholder="Ex: Labor" oninput="renderInvoice()">
             </div>
         </div>
         <div class="form-group">
             <label>Custo Total Final ($)</label>
-            <input type="number" id="totalCost" value="2900" oninput="renderInvoice()">
+            <input type="number" id="totalCost" value="" placeholder="0" oninput="renderInvoice()">
         </div>
         <div class="form-group">
             <label>Observações / Materiais Inclusos</label>
-            <input type="text" id="invoiceNotes" value="Includes cement and bricks. Lift to be provided by contractor." oninput="renderInvoice()">
+            <input type="text" id="invoiceNotes" value="" placeholder="Ex: Includes materials and labor." oninput="renderInvoice()">
         </div>
 
         <button onclick="downloadPDF()">Gerar e Baixar PDF</button>
@@ -237,7 +235,7 @@ Fill some gaps in the foundation on both sides of the house</textarea>
             <div id="invoice-pdf">
                 
                 <div class="invoice-header">
-                    <h1 id="viewDocTitle">FINAL CONSTRUCTION WORK INVOICE</h1>
+                    <h1 id="viewDocTitle">CONSTRUCTION SERVICE ESTIMATE</h1>
                     <img src="logo.png" alt="Almeida's Construction Logo" class="invoice-logo" onerror="this.style.display='none'; document.getElementById('backup-title').style.display='block';">
                     <h2 id="backup-title" style="display:none; margin:5px 0 0 0; font-size:26px;">ALMEIDA'S CONSTRUCTION</h2>
                 </div>
@@ -253,8 +251,8 @@ Fill some gaps in the foundation on both sides of the house</textarea>
                     </div>
                     <div class="address-block">
                         <h3>To:</h3>
-                        <p><strong id="viewClientName">Rockwell Construction</strong></p>
-                        <p id="viewClientAddress">1655 Pinckney Park Dr, Charleston SC 29414</p>
+                        <p><strong id="viewClientName">---</strong></p>
+                        <p id="viewClientAddress">---</p>
                         <p id="viewClientPhone"></p>
                     </div>
                 </div>
@@ -274,7 +272,7 @@ Fill some gaps in the foundation on both sides of the house</textarea>
                     </thead>
                     <tbody>
                         <tr>
-                            <td id="viewServiceDesc" style="white-space: pre-line;"></td>
+                            <td id="viewServiceDesc" style="white-space: pre-line; min-height: 100px;">---</td>
                             <td id="viewServiceSize"></td>
                             <td id="viewServiceLabor"></td>
                             <td></td>
@@ -284,7 +282,7 @@ Fill some gaps in the foundation on both sides of the house</textarea>
                             <td id="viewTotalCost"><strong>$0</strong></td>
                         </tr>
                         <tr>
-                            <td colspan="2" rowspan="2" class="notes-cell" id="viewNotes" style="font-style: italic;"></td>
+                            <td colspan="2" rowspan="2" class="notes-cell" id="viewNotes" style="font-style: italic;">---</td>
                             <td class="text-right"><strong>50% DOWN</strong></td>
                             <td id="viewDownPayment">$0</td>
                         </tr>
@@ -295,14 +293,16 @@ Fill some gaps in the foundation on both sides of the house</textarea>
                     </tbody>
                 </table>
 
-            </div> </div>
+            </div>
+
+        </div>
     </div>
 
 </div>
 
 <script>
     function renderInvoice() {
-        const docTitle = document.getElementById('docTitle').value;
+        const docTitle = document.getElementById('docTitle').value || 'CONSTRUCTION SERVICE ESTIMATE';
         const clientName = document.getElementById('clientName').value;
         const clientAddress = document.getElementById('clientAddress').value;
         const clientPhone = document.getElementById('clientPhone').value;
@@ -313,13 +313,13 @@ Fill some gaps in the foundation on both sides of the house</textarea>
         const invoiceNotes = document.getElementById('invoiceNotes').value;
 
         document.getElementById('viewDocTitle').innerText = docTitle;
-        document.getElementById('viewClientName').innerText = clientName;
-        document.getElementById('viewClientAddress').innerText = clientAddress;
+        document.getElementById('viewClientName').innerText = clientName || '---';
+        document.getElementById('viewClientAddress').innerText = clientAddress || '---';
         document.getElementById('viewClientPhone').innerText = clientPhone ? 'Phone: ' + clientPhone : '';
-        document.getElementById('viewServiceDesc').innerText = serviceDesc;
+        document.getElementById('viewServiceDesc').innerText = serviceDesc || '---';
         document.getElementById('viewServiceSize').innerText = serviceSize;
         document.getElementById('viewServiceLabor').innerText = serviceLabor;
-        document.getElementById('viewNotes').innerText = invoiceNotes;
+        document.getElementById('viewNotes').innerText = invoiceNotes || '---';
 
         const halfPayment = totalCost / 2;
         
@@ -334,10 +334,10 @@ Fill some gaps in the foundation on both sides of the house</textarea>
         const docTitle = document.getElementById('docTitle').value || 'document';
         
         const options = {
-            margin:       [0.5, 0.5, 0.5, 0.5], // Margem física interna do PDF
+            margin:       [0.5, 0.5, 0.5, 0.5],
             filename:     `${docTitle.replace(/\s+/g, '_')}_${client.replace(/\s+/g, '_')}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0, scrollX: 0 }, // Força o print a ignorar scroll da tela
+            html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0, scrollX: 0 },
             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
