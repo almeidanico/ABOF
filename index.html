@@ -13,10 +13,10 @@
             color: #333;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1.2fr;
             gap: 30px;
         }
         /* Painel de Controle / Formulário */
@@ -50,9 +50,6 @@
             box-sizing: border-box;
             font-size: 14px;
         }
-        .form-group textarea {
-            resize: vertical;
-        }
         .row-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -75,39 +72,43 @@
             background-color: #218838;
         }
 
-        /* Área de Preview do PDF (Simula uma folha Letter) */
+        /* Área de Preview e proteção contra cortes */
         .preview-section {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 4px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            min-height: 842px; /* Proporção aproximada de folha A4/Letter */
-            box-sizing: border-box;
+            background: #cbd5e1;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
         }
         
-        /* Estilos Internos da Invoice (O que vai pro PDF) */
+        /* Largura travada para simular a folha e não cortar */
         #invoice-pdf {
-            padding: 10px;
+            width: 800px;
+            min-height: 1000px;
+            padding: 40px;
             background: #fff;
+            box-sizing: border-box;
         }
         .invoice-header {
             text-align: center;
             border-bottom: 2px solid #000;
-            padding-bottom: 5px;
+            padding-bottom: 15px;
             margin-bottom: 25px;
         }
         .invoice-header h1 {
-            margin: 0;
-            font-size: 22px;
+            margin: 0 0 10px 0;
+            font-size: 20px;
             text-transform: uppercase;
             font-weight: bold;
             letter-spacing: 0.5px;
         }
-        .invoice-header h2 {
-            margin: 5px 0 0 0;
-            font-size: 26px;
-            font-weight: bold;
-            letter-spacing: 1px;
+        /* Estilo da imagem do logo */
+        .invoice-logo {
+            max-width: 250px;
+            max-height: 100px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
         }
         .addresses-container {
             display: grid;
@@ -133,10 +134,8 @@
             font-size: 13px;
             text-align: center;
             margin-bottom: 25px;
-            font-weight: normal;
         }
         
-        /* Tabela da Invoice */
         table.invoice-table {
             width: 100%;
             border-collapse: collapse;
@@ -188,7 +187,7 @@
         </div>
         <div class="form-group">
             <label>Telefone do Cliente (Opcional)</label>
-            <input type="text" id="clientPhone" value="" placeholder="Ex: 843-XXX-XXXX" oninput="renderInvoice()">
+            <input type="text" id="clientPhone" value="" oninput="renderInvoice()">
         </div>
 
         <hr style="border: 0; border-top: 1px solid #e9ecef; margin: 20px 0;">
@@ -203,7 +202,7 @@ Fill some gaps in the foundation on both sides of the house</textarea>
         <div class="row-grid">
             <div class="form-group">
                 <label>Tamanho / Size (Opcional)</label>
-                <input type="text" id="serviceSize" value="" placeholder="Ex: 200 sqft" oninput="renderInvoice()">
+                <input type="text" id="serviceSize" value="" oninput="renderInvoice()">
             </div>
             <div class="form-group">
                 <label>Mão de Obra / Labor (Opcional)</label>
@@ -227,7 +226,8 @@ Fill some gaps in the foundation on both sides of the house</textarea>
             
             <div class="invoice-header">
                 <h1 id="viewDocTitle">FINAL CONSTRUCTION WORK INVOICE</h1>
-                <h2>ALMEIDA'S CONSTRUCTION</h2>
+                <img src="logo.png" alt="Almeida's Construction Logo" class="invoice-logo" onerror="this.style.display='none'; document.getElementById('backup-title').style.display='block';">
+                <h2 id="backup-title" style="display:none; margin:5px 0 0 0; font-size:26px;">ALMEIDA'S CONSTRUCTION</h2>
             </div>
 
             <div class="addresses-container">
@@ -262,25 +262,23 @@ Fill some gaps in the foundation on both sides of the house</textarea>
                 </thead>
                 <tbody>
                     <tr>
-                        <td id="viewServiceDesc" style="white-space: pre-line;">Plaster the existing pillar blocks<br><br>Fill some gaps in the foundation on both sides of the house</td>
+                        <td id="viewServiceDesc" style="white-space: pre-line;"></td>
                         <td id="viewServiceSize"></td>
                         <td id="viewServiceLabor"></td>
                         <td></td>
                     </tr>
                     <tr>
                         <td colspan="3" class="text-right"><strong>Final Cost</strong></td>
-                        <td id="viewTotalCost"><strong>$2,900</strong></td>
+                        <td id="viewTotalCost"><strong>$0</strong></td>
                     </tr>
                     <tr>
-                        <td colspan="2" rowspan="2" class="notes-cell" id="viewNotes" style="font-style: italic;">
-                            Includes cement and bricks. Lift to be provided by contractor.
-                        </td>
+                        <td colspan="2" rowspan="2" class="notes-cell" id="viewNotes" style="font-style: italic;"></td>
                         <td class="text-right"><strong>50% DOWN</strong></td>
-                        <td id="viewDownPayment">$1,450</td>
+                        <td id="viewDownPayment">$0</td>
                     </tr>
                     <tr>
                         <td class="text-right"><strong>50% UPON COMPLETION</strong></td>
-                        <td id="viewCompletionPayment">$1,450</td>
+                        <td id="viewCompletionPayment">$0</td>
                     </tr>
                 </tbody>
             </table>
@@ -291,7 +289,6 @@ Fill some gaps in the foundation on both sides of the house</textarea>
 </div>
 
 <script>
-    // Atualiza o documento na tela conforme digita
     function renderInvoice() {
         const docTitle = document.getElementById('docTitle').value;
         const clientName = document.getElementById('clientName').value;
@@ -303,7 +300,6 @@ Fill some gaps in the foundation on both sides of the house</textarea>
         const totalCost = parseFloat(document.getElementById('totalCost').value) || 0;
         const invoiceNotes = document.getElementById('invoiceNotes').value;
 
-        // Atualizando textos fixos do formulário no preview
         document.getElementById('viewDocTitle').innerText = docTitle;
         document.getElementById('viewClientName').innerText = clientName;
         document.getElementById('viewClientAddress').innerText = clientAddress;
@@ -313,7 +309,6 @@ Fill some gaps in the foundation on both sides of the house</textarea>
         document.getElementById('viewServiceLabor').innerText = serviceLabor;
         document.getElementById('viewNotes').innerText = invoiceNotes;
 
-        // Realizando as contas matemáticas dos 50% automaticamente
         const halfPayment = totalCost / 2;
         
         document.getElementById('viewTotalCost').innerHTML = '<strong>$' + totalCost.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2}) + '</strong>';
@@ -321,25 +316,22 @@ Fill some gaps in the foundation on both sides of the house</textarea>
         document.getElementById('viewCompletionPayment').innerText = '$' + halfPayment.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2});
     }
 
-    // Disparado ao clicar no botão, gera o arquivo PDF limpo
     function downloadPDF() {
         const element = document.getElementById('invoice-pdf');
         const client = document.getElementById('clientName').value || 'client';
         const docTitle = document.getElementById('docTitle').value || 'document';
         
-        // Configurações do arquivo PDF finalizado
         const options = {
-            margin:       [0.5, 0.5, 0.5, 0.5], // Margens da folha
+            margin:       [0.3, 0.3, 0.3, 0.3],
             filename:     `${docTitle.replace(/\s+/g, '_')}_${client.replace(/\s+/g, '_')}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
+            html2canvas:  { scale: 2, useCORS: true, logging: false },
             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
         html2pdf().set(options).from(element).save();
     }
 
-    // Roda a função uma vez ao carregar a página para preencher os valores padrão
     renderInvoice();
 </script>
 
