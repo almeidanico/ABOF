@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABOF - Almeida's Construction Invoice Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        /* Painel de Controle / Formulário */
+        .form-section {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+        .form-section h2 {
+            margin-top: 0;
+            color: #004085;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            resize: vertical;
+        }
+        .row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+
+        /* Área de Preview do PDF (Simula uma folha Letter) */
+        .preview-section {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            min-height: 842px; /* Proporção aproximada de folha A4/Letter */
+            box-sizing: border-box;
+        }
+        
+        /* Estilos Internos da Invoice (O que vai pro PDF) */
+        #invoice-pdf {
+            padding: 10px;
+            background: #fff;
+        }
+        .invoice-header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+            margin-bottom: 25px;
+        }
+        .invoice-header h1 {
+            margin: 0;
+            font-size: 22px;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .invoice-header h2 {
+            margin: 5px 0 0 0;
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .addresses-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        .address-block h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            padding-bottom: 2px;
+        }
+        .address-block p {
+            margin: 4px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .payment-terms-banner {
+            border: 1px solid #000;
+            padding: 10px;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: normal;
+        }
+        
+        /* Tabela da Invoice */
+        table.invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        table.invoice-table th, table.invoice-table td {
+            border: 1px solid #000;
+            padding: 10px;
+            font-size: 14px;
+            text-align: left;
+            vertical-align: top;
+        }
+        table.invoice-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .text-right {
+            text-align: right !important;
+        }
+        .notes-cell {
+            font-size: 13px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="form-section">
+        <h2>ABOF - Painel de Controle</h2>
+        
+        <div class="form-group">
+            <label>Tipo de Documento</label>
+            <input type="text" id="docTitle" value="FINAL CONSTRUCTION WORK INVOICE" oninput="renderInvoice()">
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #e9ecef; margin: 20px 0;">
+        
+        <h3>Dados do Contratante (Cliente)</h3>
+        <div class="form-group">
+            <label>Nome do Cliente / Empresa</label>
+            <input type="text" id="clientName" value="Rockwell Construction" oninput="renderInvoice()">
+        </div>
+        <div class="form-group">
+            <label>Endereço do Cliente</label>
+            <input type="text" id="clientAddress" value="1655 Pinckney Park Dr, Charleston SC 29414" oninput="renderInvoice()">
+        </div>
+        <div class="form-group">
+            <label>Telefone do Cliente (Opcional)</label>
+            <input type="text" id="clientPhone" value="" placeholder="Ex: 843-XXX-XXXX" oninput="renderInvoice()">
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #e9ecef; margin: 20px 0;">
+
+        <h3>Serviços e Valores</h3>
+        <div class="form-group">
+            <label>Descrição dos Serviços Prestados</label>
+            <textarea id="serviceDesc" rows="5" oninput="renderInvoice()">Plaster the existing pillar blocks
+
+Fill some gaps in the foundation on both sides of the house</textarea>
+        </div>
+        <div class="row-grid">
+            <div class="form-group">
+                <label>Tamanho / Size (Opcional)</label>
+                <input type="text" id="serviceSize" value="" placeholder="Ex: 200 sqft" oninput="renderInvoice()">
+            </div>
+            <div class="form-group">
+                <label>Mão de Obra / Labor (Opcional)</label>
+                <input type="text" id="serviceLabor" value="" oninput="renderInvoice()">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Custo Total Final ($)</label>
+            <input type="number" id="totalCost" value="2900" oninput="renderInvoice()">
+        </div>
+        <div class="form-group">
+            <label>Observações / Materiais Inclusos</label>
+            <input type="text" id="invoiceNotes" value="Includes cement and bricks. Lift to be provided by contractor." oninput="renderInvoice()">
+        </div>
+
+        <button onclick="downloadPDF()">Gerar e Baixar PDF</button>
+    </div>
+
+    <div class="preview-section">
+        <div id="invoice-pdf">
+            
+            <div class="invoice-header">
+                <h1 id="viewDocTitle">FINAL CONSTRUCTION WORK INVOICE</h1>
+                <h2>ALMEIDA'S CONSTRUCTION</h2>
+            </div>
+
+            <div class="addresses-container">
+                <div class="address-block">
+                    <h3>From:</h3>
+                    <p><strong>Almeida's Construction LLC</strong></p>
+                    <p>1235 Ashley Garden Blvd, Unit 6207</p>
+                    <p>Charleston SC 29414</p>
+                    <p>Phone: 803-661-1070</p>
+                    <p>Email: almeidasconstructionllc@hotmail.com</p>
+                </div>
+                <div class="address-block">
+                    <h3>To:</h3>
+                    <p><strong id="viewClientName">Rockwell Construction</strong></p>
+                    <p id="viewClientAddress">1655 Pinckney Park Dr, Charleston SC 29414</p>
+                    <p id="viewClientPhone"></p>
+                </div>
+            </div>
+
+            <div class="payment-terms-banner">
+                50% down payment and 50% upon completion; total payment includes materials and labor.
+            </div>
+
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th style="width: 10%;">Size</th>
+                        <th style="width: 10%;">Labor</th>
+                        <th style="width: 22%;">Total Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="viewServiceDesc" style="white-space: pre-line;">Plaster the existing pillar blocks<br><br>Fill some gaps in the foundation on both sides of the house</td>
+                        <td id="viewServiceSize"></td>
+                        <td id="viewServiceLabor"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-right"><strong>Final Cost</strong></td>
+                        <td id="viewTotalCost"><strong>$2,900</strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" rowspan="2" class="notes-cell" id="viewNotes" style="font-style: italic;">
+                            Includes cement and bricks. Lift to be provided by contractor.
+                        </td>
+                        <td class="text-right"><strong>50% DOWN</strong></td>
+                        <td id="viewDownPayment">$1,450</td>
+                    </tr>
+                    <tr>
+                        <td class="text-right"><strong>50% UPON COMPLETION</strong></td>
+                        <td id="viewCompletionPayment">$1,450</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Atualiza o documento na tela conforme digita
+    function renderInvoice() {
+        const docTitle = document.getElementById('docTitle').value;
+        const clientName = document.getElementById('clientName').value;
+        const clientAddress = document.getElementById('clientAddress').value;
+        const clientPhone = document.getElementById('clientPhone').value;
+        const serviceDesc = document.getElementById('serviceDesc').value;
+        const serviceSize = document.getElementById('serviceSize').value;
+        const serviceLabor = document.getElementById('serviceLabor').value;
+        const totalCost = parseFloat(document.getElementById('totalCost').value) || 0;
+        const invoiceNotes = document.getElementById('invoiceNotes').value;
+
+        // Atualizando textos fixos do formulário no preview
+        document.getElementById('viewDocTitle').innerText = docTitle;
+        document.getElementById('viewClientName').innerText = clientName;
+        document.getElementById('viewClientAddress').innerText = clientAddress;
+        document.getElementById('viewClientPhone').innerText = clientPhone ? 'Phone: ' + clientPhone : '';
+        document.getElementById('viewServiceDesc').innerText = serviceDesc;
+        document.getElementById('viewServiceSize').innerText = serviceSize;
+        document.getElementById('viewServiceLabor').innerText = serviceLabor;
+        document.getElementById('viewNotes').innerText = invoiceNotes;
+
+        // Realizando as contas matemáticas dos 50% automaticamente
+        const halfPayment = totalCost / 2;
+        
+        document.getElementById('viewTotalCost').innerHTML = '<strong>$' + totalCost.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2}) + '</strong>';
+        document.getElementById('viewDownPayment').innerText = '$' + halfPayment.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2});
+        document.getElementById('viewCompletionPayment').innerText = '$' + halfPayment.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2});
+    }
+
+    // Disparado ao clicar no botão, gera o arquivo PDF limpo
+    function downloadPDF() {
+        const element = document.getElementById('invoice-pdf');
+        const client = document.getElementById('clientName').value || 'client';
+        const docTitle = document.getElementById('docTitle').value || 'document';
+        
+        // Configurações do arquivo PDF finalizado
+        const options = {
+            margin:       [0.5, 0.5, 0.5, 0.5], // Margens da folha
+            filename:     `${docTitle.replace(/\s+/g, '_')}_${client.replace(/\s+/g, '_')}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        html2pdf().set(options).from(element).save();
+    }
+
+    // Roda a função uma vez ao carregar a página para preencher os valores padrão
+    renderInvoice();
+</script>
+
+</body>
+</html>
