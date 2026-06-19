@@ -72,7 +72,7 @@
             background-color: #218838;
         }
 
-        /* Área de Preview e proteção contra cortes */
+        /* Área de Preview na tela */
         .preview-section {
             background: #cbd5e1;
             padding: 20px;
@@ -81,14 +81,25 @@
             justify-content: center;
         }
         
-        /* Largura travada para simular a folha e não cortar */
-        #invoice-pdf {
+        /* Container visual do papel na TELA */
+        .invoice-paper-shadow {
+            background: #fff;
             width: 800px;
             min-height: 1000px;
             padding: 40px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        /* Elemento real que vai virar o PDF (Zera margens e posicionamento pro HTML2PDF) */
+        #invoice-pdf {
+            width: 100%;
+            margin: 0 !important;
+            padding: 0 !important;
             background: #fff;
             box-sizing: border-box;
         }
+
         .invoice-header {
             text-align: center;
             border-bottom: 2px solid #000;
@@ -102,7 +113,6 @@
             font-weight: bold;
             letter-spacing: 0.5px;
         }
-        /* Estilo da imagem do logo */
         .invoice-logo {
             max-width: 250px;
             max-height: 100px;
@@ -222,68 +232,70 @@ Fill some gaps in the foundation on both sides of the house</textarea>
     </div>
 
     <div class="preview-section">
-        <div id="invoice-pdf">
+        <div class="invoice-paper-shadow">
             
-            <div class="invoice-header">
-                <h1 id="viewDocTitle">FINAL CONSTRUCTION WORK INVOICE</h1>
-                <img src="logo.png" alt="Almeida's Construction Logo" class="invoice-logo" onerror="this.style.display='none'; document.getElementById('backup-title').style.display='block';">
-                <h2 id="backup-title" style="display:none; margin:5px 0 0 0; font-size:26px;">ALMEIDA'S CONSTRUCTION</h2>
-            </div>
-
-            <div class="addresses-container">
-                <div class="address-block">
-                    <h3>From:</h3>
-                    <p><strong>Almeida's Construction LLC</strong></p>
-                    <p>1235 Ashley Garden Blvd, Unit 6207</p>
-                    <p>Charleston SC 29414</p>
-                    <p>Phone: 803-661-1070</p>
-                    <p>Email: almeidasconstructionllc@hotmail.com</p>
+            <div id="invoice-pdf">
+                
+                <div class="invoice-header">
+                    <h1 id="viewDocTitle">FINAL CONSTRUCTION WORK INVOICE</h1>
+                    <img src="logo.png" alt="Almeida's Construction Logo" class="invoice-logo" onerror="this.style.display='none'; document.getElementById('backup-title').style.display='block';">
+                    <h2 id="backup-title" style="display:none; margin:5px 0 0 0; font-size:26px;">ALMEIDA'S CONSTRUCTION</h2>
                 </div>
-                <div class="address-block">
-                    <h3>To:</h3>
-                    <p><strong id="viewClientName">Rockwell Construction</strong></p>
-                    <p id="viewClientAddress">1655 Pinckney Park Dr, Charleston SC 29414</p>
-                    <p id="viewClientPhone"></p>
+
+                <div class="addresses-container">
+                    <div class="address-block">
+                        <h3>From:</h3>
+                        <p><strong>Almeida's Construction LLC</strong></p>
+                        <p>1235 Ashley Garden Blvd, Unit 6207</p>
+                        <p>Charleston SC 29414</p>
+                        <p>Phone: 803-661-1070</p>
+                        <p>Email: almeidasconstructionllc@hotmail.com</p>
+                    </div>
+                    <div class="address-block">
+                        <h3>To:</h3>
+                        <p><strong id="viewClientName">Rockwell Construction</strong></p>
+                        <p id="viewClientAddress">1655 Pinckney Park Dr, Charleston SC 29414</p>
+                        <p id="viewClientPhone"></p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="payment-terms-banner">
-                50% down payment and 50% upon completion; total payment includes materials and labor.
-            </div>
+                <div class="payment-terms-banner">
+                    50% down payment and 50% upon completion; total payment includes materials and labor.
+                </div>
 
-            <table class="invoice-table">
-                <thead>
-                    <tr>
-                        <th>Service</th>
-                        <th style="width: 10%;">Size</th>
-                        <th style="width: 10%;">Labor</th>
-                        <th style="width: 22%;">Total Cost</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td id="viewServiceDesc" style="white-space: pre-line;"></td>
-                        <td id="viewServiceSize"></td>
-                        <td id="viewServiceLabor"></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" class="text-right"><strong>Final Cost</strong></td>
-                        <td id="viewTotalCost"><strong>$0</strong></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" rowspan="2" class="notes-cell" id="viewNotes" style="font-style: italic;"></td>
-                        <td class="text-right"><strong>50% DOWN</strong></td>
-                        <td id="viewDownPayment">$0</td>
-                    </tr>
-                    <tr>
-                        <td class="text-right"><strong>50% UPON COMPLETION</strong></td>
-                        <td id="viewCompletionPayment">$0</td>
-                    </tr>
-                </tbody>
-            </table>
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th style="width: 10%;">Size</th>
+                            <th style="width: 10%;">Labor</th>
+                            <th style="width: 22%;">Total Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="viewServiceDesc" style="white-space: pre-line;"></td>
+                            <td id="viewServiceSize"></td>
+                            <td id="viewServiceLabor"></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-right"><strong>Final Cost</strong></td>
+                            <td id="viewTotalCost"><strong>$0</strong></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" rowspan="2" class="notes-cell" id="viewNotes" style="font-style: italic;"></td>
+                            <td class="text-right"><strong>50% DOWN</strong></td>
+                            <td id="viewDownPayment">$0</td>
+                        </tr>
+                        <tr>
+                            <td class="text-right"><strong>50% UPON COMPLETION</strong></td>
+                            <td id="viewCompletionPayment">$0</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-        </div>
+            </div> </div>
     </div>
 
 </div>
@@ -322,10 +334,10 @@ Fill some gaps in the foundation on both sides of the house</textarea>
         const docTitle = document.getElementById('docTitle').value || 'document';
         
         const options = {
-            margin:       [0.3, 0.3, 0.3, 0.3],
+            margin:       [0.5, 0.5, 0.5, 0.5], // Margem física interna do PDF
             filename:     `${docTitle.replace(/\s+/g, '_')}_${client.replace(/\s+/g, '_')}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, logging: false },
+            html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0, scrollX: 0 }, // Força o print a ignorar scroll da tela
             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
